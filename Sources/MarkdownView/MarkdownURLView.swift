@@ -15,11 +15,27 @@ struct MarkdownURLView: View {
             case .loaded(let markdown):
                 MarkdownContentView(markdown: markdown)
             case .failed(let error):
-                ContentUnavailableView(
-                    "Failed to load",
-                    systemImage: "exclamationmark.triangle",
-                    description: Text(error.localizedDescription)
-                )
+                if #available(iOS 17.0, macOS 14.0, *) {
+                    ContentUnavailableView(
+                        "Failed to load",
+                        systemImage: "exclamationmark.triangle",
+                        description: Text(error.localizedDescription)
+                    )
+                } else {
+                    VStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.largeTitle)
+                            .foregroundStyle(.secondary)
+                        Text("Failed to load")
+                            .font(.headline)
+                        Text(error.localizedDescription)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
             }
         }
         .task(id: url) {
